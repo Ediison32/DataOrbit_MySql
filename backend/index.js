@@ -1,6 +1,6 @@
 
 // import all requere
-
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -22,7 +22,6 @@ app.use(bodyParser.json());
 
 
 // mostrar todos los empleados 
-
 app.get('/employee', (req, res)=>{
     // in sql i put the query for that request
     try{
@@ -44,8 +43,6 @@ app.get('/employee', (req, res)=>{
 
 // metodo post para agregar informacion a la base de datos apenas el front le haga una petcion 
 app.post('/employee',  (req, res)=>{
-    console.log("HOLA DESDE EL BACKET ");
-    
     try{
         const {name, first_name, second_name, email, charge, salary, city, age} = req.body; // desesctructuro el body
         console.log(name, first_name,second_name, email,charge, salary,city, age);
@@ -75,6 +72,65 @@ app.post('/employee',  (req, res)=>{
         
     }
 })
+
+// funcion acutalizar
+app.put('/employee/:id',(req, res)=>{
+
+    try{
+        
+        const {id} = req.params;
+        console.log(id);
+        
+        const {name, first_name, second_name, email, charge, salary, city, age}= req.body;
+        console.log(name, first_name,second_name, email,charge, salary,city, age);
+        
+        const table = 'employee'
+        const sql = `UPDATE ${table}
+                    SET Name=?, LastName=?, LastName2=?, email=?, charge=?, salary=?, city=?,age=?
+                    WHERE id_Employee =? `
+        db.query(sql,  [name, first_name, second_name, email, charge, salary,city, age,id], (err, result)=>{
+            if(err){
+                console.error("el esroro es ", err);
+            }else{
+                res.json({ mensaje: 'Usuario actualizado', filasAfectadas: result.affectedRows });
+            }
+        })
+    }catch(err){
+        console.error("erro al intentar acutalizar ");
+        
+    }
+   
+    
+});
+
+
+
+//funcio eliminar id 
+app.delete('/employee/:id', (req, res)=>{
+    try{
+        const {id}= req.params;
+        console.log(id);
+        
+        const sql = 'DELETE FROM  employee WHERE id_Employee =?';
+        db.query(sql, [id], (err, resul)=>{
+            if(err){
+                console.error("SAlio un error al inteertar eliminar ", err);
+                
+            }else{
+                res.json({ mensaje: 'Usuario Eliminado'});
+            }
+        })
+    }catch(erro){
+        console.log("error");
+        
+    }
+});
+
+
+
+
+
+
 
 
 // correr el servidor 
